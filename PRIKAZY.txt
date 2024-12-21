@@ -1,3 +1,6 @@
+Pro každý soubor Git počítá kontrolní součet SHA-1 v podobě 40místného hexadecimálního čísla, podle kterého si Git soubor ukládá.
+
+
 git --version
 git -v
 	verze gitu
@@ -278,4 +281,102 @@ git fetch --all
 
 
 git pull
-	
+	provede najednou příkazy git fetch a git merge
+	tzn stáhne data a provede sloučení
+
+
+---------------------
+| vnitřní struktura |
+---------------------
+vnitřní struktura Gitu je tvořená z objektů typu blob, tree, commit a tag
+
+složka .git v repositáři obsahuje soubory a složky:
+	HEAD – odkazuje na aktuální referenční bod v repozitáři, aktuální větev (branch) nebo na konkrétní commit
+
+	description – obsahuje textový popis repozitáře,
+
+	index – uchovává informace o stavu pracovní složky a staging oblasti,
+
+	logs/ – obsahuje historii událostí v repozitáři,
+
+	packed-refs – obsahuje seznam zabalovaných referencí, typicky odkazy na konkrétní commity,
+
+	config – uchovává konfiguraci repozitáře,
+
+	hooks/ – obsahuje spouštěcí skripty pro různé události,
+
+	info/ – obsahuje různé informace o repozitáři,
+
+	objects/ – uchovává všechny objekty v repozitáři,
+
+	refs/ – obsahuje odkazy na commity a větve,
+
+	COMMIT_EDITMSG – obsahuje zprávy commitů,
+
+	ORIG_HEAD – ukládá stav hlavy před provedením operace změny
+
+
+složka objects = databáze objektů Gitu
+	obsahuje tyto složky:
+	info/ – ukládá nezabalované objekty, obsahuje metadata a další informace o objektech v repozitáři,
+
+	pack/ – ukládá zabalované objekty, čímž zlepšuje efektivitu úložiště a urychluje operace v repozitáři Git
+
+	složky s číselnými názvy označují shluky objektů v repozitáři
+		první dvě čísla z hashe commitu = název složky
+		zbývající část hashe = název souboru ve složce s prvními dvěma čísly hashe
+
+	logs/ - historie událostí v repozitáři
+
+	info/ - slouží k uchování různých konfiguračních a informačních souborů, které poskytují metadata a další užitečné údaje pro Git repozitář
+	obsahuje tyto soubory:
+		exclude – obsahuje pravidla pro ignorování souborů a složek v rámci repozitáře, podobně jako soubor .gitignore,
+
+		grafts – uchovává informace o historických bodech spojování commitů, takzvaných graft points, a to v případě změny historie větví,
+
+		attributes – obsahuje specifické nastavení pro různé typy souborů, jako jsou atributy ovlivňující chování Gitu při práci se soubory.
+
+
+vnitřní struktura Gitu je tvořená z objektů typu blob, tree, commit a tag
+objekt commit = zkomprimovaný textový soubor s hashem uložený v úložišti objektů -> objects
+
+	git cat-file <hash commitu> -t
+		vypíše typ objektu
+
+	git cat-file <hash commitu> -p
+		vypíše obsah commitu
+			obsahuje:
+				metadata o commitu jako informace o stromu (tree),
+				rodičovské commity,
+				autora,
+				commitera,
+				samotnou zprávu ke commitu
+
+objekt tree = používá se k ukládání složek projektu
+	git cat-file <hash stromu> -t
+		vypíše typ objektu
+
+	git cat-file <hash stromu> -p
+		vypíše obsah ve stromu = oprávnění, typ objektu, hash objektu, název souboru
+		
+objekt blob = binární nebo textová data souboru
+	git cat-file <hash blobu> -t
+		vypíše typ objektu
+
+	git cat-file <hash blobu> -p
+		vypíše obsah blobu
+
+objekt tag = statický odkaz na konkrétní commit, jeho hodnota se nemění
+	uloženy v  refs/tags/
+		přepnutí do složky	= cd .git/refs/tags/
+		výpis složky		= ls
+		získání hashe tagu	= cat <název tagu>
+
+	git cat-file <hash tagu> -t
+		vypíše typ objektu
+
+	git cat-file <hash tagu> -p
+		vypíše obsah tagu
+
+Git zpracovává objekty vytvořené v databázi tak efektivně, že znovu používá objekty blob pokaždé, když je obsah stejný.
+Nezáleží na tom, zda se jedná o jiný soubor vytvořený v jiné složce. To je důvod, proč jsou názvy souborů uloženy ve stromech. Toto rozhodnutí umožňuje systému Git zpracovávat odkazy na stejný objekt blob s různými názvy souborů.
