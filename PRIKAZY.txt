@@ -1,0 +1,281 @@
+git --version
+git -v
+	verze gitu
+
+git --help
+	nápověda
+
+git config --global user.name jméno
+git config --global user.email emailová adresa
+	nastavení jména a emailu
+
+git config --list
+	zobrazí všechna nastavení
+
+git init
+	vytvoří repositář
+
+git status
+	sledování aktuálního stavu repositáře
+
+git remote
+	výpis seznamu odkazů na vzdálené repositáře
+
+git remote show <název zdroje>
+	výpis seznamu větví na serveru
+
+git remote add <název zdroje> <URL repositáře>
+	vytvoří odkaz na vzdálený repositář
+	URL získám v sekci Quick setup připojovaného repositáře na GitHubu
+
+cd NázevSložky
+	změna složky
+
+git add NázevSouboru
+	přidání souboru do stage
+git add NázevSouboru1 NázevSouboru2 Adresář/NázevSouboru
+	přidání souborů do stage
+git add .
+	přidání všech souborů v pracovním adresáři do stage
+
+git commit -m "Název commitu"
+	vytvoří commit pro přidané soubory ve staging oblasti
+
+git log
+	ověření commitu
+
+git commit
+	vytvoření commitu s delším popisem
+	otevře se editor Vim
+	postup:
+		1. Stisknutím klávesy I se přepneme do režimu editace.
+		2. Na první řádek napíšeme stručný popis commitu, například "Přidán soubor index.html."
+		3. Ponecháme prázdný řádek a přesuneme se na třetí řádek.
+		4. Napíšeme podrobný popis commitu, například "Vytvoření nového projektu a přidání HTML souboru index.html, který obsahuje základní HTML kód stránky.."
+		5. Stiskem klávesy Esc se přepneme do režimu příkazů.
+		6. Napíšeme příkaz :wq, čímž uložíme soubor a ukončíme editor.
+
+git clone <URL adresa repositáře>
+	klonování existujícího repositáře z URL adresy
+
+.gitignore
+	definuje, které soubory a složky má Git ignorovat (nebudou ve výstupu - git status - a nebudou zahrnuty do commitů a ani do repositáře)
+	Příklady vzorů:
+		file.txt: Ignoruje konkrétní soubor file.txt v kořenové složce projektu.
+		logs/: Ignoruje všechny soubory a složky ve složce logs/.
+		*.log: Ignoruje všechny soubory s příponou .log.
+
+git tag
+	zobrazí všechny tagy v repozitáři
+	prohlížení šipkami nahoru a dolů, ukončení prohlížení "q"
+
+git tag <Název tagu>
+	vytvoří tzv lehký tag = ukazatel na commit
+
+git tag -a <nazev tagu> -m "<zpráva k tagu>"
+	vytvoří anotovaný tag = plnohodnotný objekt, srovnatelný s commitem
+
+
+-----------
+| git log |
+-----------
+	výpis všech commitů, zobrazení změn v souborech, filtrování historie a zobrazení historie větví
+
+git log --oneline
+	zkrácený výpis = <hash> a <název>
+
+git log -<pocet>
+	výpis uvedeného počtu commitů
+
+git log --stat
+	zobrazí commity se změnami provedenými v souborech
+
+git log --stat -p
+	podrobný přehled o provedených změnách
+
+git log --oneline --after="<datum>" --before="<datum>"
+	filtrování historie podle data vytvoření
+
+git log -- <název souboru>
+	filtrování podle souboru
+
+git log --all --graph --oneline --decorate
+	celková historie vč. změn na jednotlivých větvích
+
+
+--------------
+| git branch |
+--------------
+	zobrazení seznamu větví
+
+git branch -a
+git branch --all
+	výpis místních a vzdálených větví
+
+výpis dalších informací o větvích
+git branch -v
+	poslední commit na větvi
+git branch -r
+git branch --remote
+	seznam všech větví na vzdáleném serveru
+
+git branch <název větve>
+	vytvoří novou větev
+
+git branch -m <stara-vetev> <nova-vetev>
+	přejmenuje větev
+
+git branch -d <název větve>
+	smaže větev
+
+git push origin --delete <název větve>
+	smaže větve na vzdáleném repozitáři
+
+git checkout <název větve>
+	přepnutí na jinou větev
+	!!! Při přepnutí na jinou větev se nám pracovní prostor automaticky aktualizuje na poslední verzi dané větve.
+
+git checkout -b <název nové větve>
+	vytvoří novou větev a přepne nás na ní
+
+git checkout <název_větve> -- <název_souboru>
+	obnovení souborů do stavu z předchozích commitů nebo větví
+
+git fetch --all
+	prohlížení větví ze vzdálených uložišť
+
+
+-------------
+| git merge |
+-------------
+	slučování větví
+
+git merge <název_větve>
+	obsah a změny ze slučované větve se začlení do cílové větve
+
+	!!! před sloučením !!!
+	zkontrolovat zda HEAD ukazuje na správnou větev přijímající sloučení
+		git status
+	pokud nejsme na správné větvi pak změníme větev
+		git checkout <název větve>
+	ujistit se že cílová a slučovací větev mají poslední commity
+	pro aktualizaci větví spustit
+		git fetch
+	po dokončení načítání se ujistit, že cílová větev má nejnovější aktualizace
+		git pull
+	vybrat správný typ sloučení
+	fast-forward merge = pokud commity cílové větve nejsou novější než commity slučované větve
+	3-way merge = pokud commity cílové větve jsou novější než commity slučované větve, tzn od okamžiku rozvětvení se obě větve rozvíjely
+		
+Git se pokusí o sloučení sám, ale v případě konfliktů, označí místa s konflikty, která musí uživatelé ručně vyřešit.
+Výpis souborů, které kolizi způsobily provedeme příkazem
+	git status
+
+Typy kolizí
+	selhání při spuštění -> zobrazí se tato zpráva
+		error: Entry '<fileName>' not uptodate. Cannot merge. (Changes in working directory)
+		tento problém vzniká kvůli existujícím lokálním změnám
+		k převzetí kontroly nad místním stavem slouží příkazy
+			git checkout, git commit a git reset
+
+	selhání při slučování -> došlo ke konfliktu mezi aktuální cílovou a slučovanou větví -> zobrazí se zpráva
+		error: Entry '<fileName>' would be overwritten by merge. Cannot merge. (Changes in staging area)
+		
+Identifikace konfliktů při slučování
+	po spuštění	git merge
+	určit z výpisu soubory s kolizí
+	místa v souboru s kolizí jsou označena, např.:
+		<<<<<<< HEAD
+		Editace souboru na větvi 10.x
+		=======
+		Editace souboru na větvi feature
+		>>>>>>> feature
+
+	<<<<<<< HEAD	- odtud ke středu kolize je obsah v aktuální cílové větvi
+	=======	označují střed kolize
+	>>>>>>> feature	- od středu kolize až sem je obsah ve slučované větvi
+	
+	nejčastějsí způsob řešení spočívá v ručním opravení kolizního souboru, tzn:
+		editovat soubor
+		odstranění kolizních značek
+			<<<<<<< HEAD	=======		>>>>>>> feature
+		a určit které změny v souboru mají být zachovány
+
+	upravený soubor uložit
+		git add .
+	a provést commmit pro uložení provedených změn
+		git commit -m "Oprava kolize při sloučení větví"
+
+	po vytvoření commitu je kolize vyřešena a změny jsou uloženy v repositáři
+	sloučení větví se dokončí po vytvoření commitu
+
+------------
+| git show |
+------------
+	zobrazení detailů posledního commitu
+
+git show <hash>
+git show <název tagu>
+	zobrazí commit podle hashe nebo názvu tagu
+
+
+------------
+| git diff |
+------------
+	porovnání změn v pracovním adresáři k aktuálnímu stavu repositáře
+
+git diff <argumenty> <název souboru>
+
+	argumenty:
+		--staged: Ukáže rozdíly mezi indexem a posledním commitovaným stavem.
+		--color: Zobrazí výsledek s barvami pro zvýraznění změn.
+		--name-only: Zobrazí pouze názvy souborů, ve kterých byly změny provedeny.
+
+příklad:
+	$ echo 'Nový text do souboru' > testovaci_soubor
+	$ git add .
+	$ git commit -m "Vytvoření nového testovacího souboru testovaci_soubor"
+	$ echo 'Nově přidaný text' >> testovaci_soubor
+
+Pro zobrazení změn mezi dvěma commity bychom použili příkaz git diff <commit_1> <commit_2>. Rozdíly mezi větvemi bychom vypsali příkazem git diff <větev_1>..<větev_2>.
+
+
+-------------
+| git reset |
+-------------
+	vrací stav repositáře k určitému commitu
+	odstraní se změny provedené po určitém commitu a vracíme se k předchozímu stavu
+
+	!!! změny mohou být nebezpečné !!!
+	!!! NIKDY neprovádět na vzdálených uložištích !!!
+
+git reset --soft
+	Resetuje hlavičku (HEAD), ale pracovní strom a index zůstanou nezměněné. Změny, které byly provedeny po daném commitu, zůstanou ve stavu k dispozici pro nový commit.
+
+git reset --mixed	<-- výchozí chování
+	Resetuje hlavičku (HEAD) a pracovní strom, ale index zůstává nezměněný. Změny po daném commitu nebudou součástí následujícího commitu, ale zůstanou ve stavu k dispozici pro další úpravy.
+
+git reset --hard
+	Resetuje hlavičku (HEAD), pracovní strom a index. Změny po daném commitu budou odstraněny a vrátí se k přesnému stavu repozitáře v daném commitu.
+	!!! může způsobit trvalou ztrátu změn provedených po daném commitu. !!!
+
+
+-----------------------
+| práce s repositářem |
+-----------------------
+git push
+	pošle aktuální větev na server
+	pokud má odesílaná větev na serveru jiný název pak použít tento příkaz
+		git push [zdroj] [název lokální větve]:[název větve na vzdáleném serveru]
+
+git fetch [název-zdroje] [větev]
+	stáhne data ze vzdáleného úložiště, aniž je integruje do našich pracovních souborů
+	nenaruší naši pracovní kopii
+git fetch --all
+	pro stažení všech registrovaných vzdálených repositářů a jejich větví
+
+	po stažení pomocí git fetch se přepnout na staženou větev a provést sloučení pomocí příkazu git merge
+
+
+git pull
+	
